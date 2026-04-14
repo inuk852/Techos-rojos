@@ -1,0 +1,138 @@
+/* 🌑 Fondo general */
+body {
+  margin: 0;
+  font-family: 'Noto Sans SC', 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #2b0000, #5a0000);
+  color: #fff;
+
+  display: flex;
+  justify-content: center;
+}
+
+/* 📦 Contenedor principal */
+#root {
+  width: 100%;
+  max-width: 900px;
+  padding: 20px;
+}
+
+/* 🏮 Título */
+h1 {
+  text-align: center;
+  color: gold;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+  letter-spacing: 2px;
+}
+
+/* 🧧 Cards */
+.card {
+  background: rgba(139, 0, 0, 0.85);
+  border: 2px solid gold;
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+  animation: fadeIn 0.5s ease;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 🔥 centra contenido */
+}
+
+/* 🟡 Botones */
+.button {
+  background: linear-gradient(45deg, #b8860b, #ffd700);
+  color: #2b0000;
+  font-weight: bold;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+
+  width: auto;
+  margin: 6px;
+  display: inline-block;
+
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+/* ✨ Hover elegante */
+.button:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 5px 15px rgba(255, 215, 0, 0.7);
+}
+
+/* ✨ Click efecto */
+.button:active {
+  transform: scale(0.96);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+}
+
+/* ✨ Brillo dorado animado */
+.button::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255, 255, 255, 0.6),
+    transparent
+  );
+  transform: skewX(-20deg);
+}
+
+/* ✨ Animación de brillo */
+.button:hover::after {
+  animation: shine 0.7s ease;
+}
+
+/* 🧾 Inputs */
+input {
+  width: 90%;
+  max-width: 300px;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 8px;
+  border: 1px solid gold;
+  background: #fff5e1;
+  color: #2b0000;
+  text-align: center;
+}
+
+/* 🧧 Texto dorado */
+h2, h3 {
+  color: gold;
+  text-align: center;
+}
+
+/* 📋 Listas centradas */
+div {
+  text-align: center;
+}
+
+/* ✨ Animaciones */
+
+/* Entrada suave */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Brillo */
+@keyframes shine {
+  100% {
+    left: 120%;
+  }
+}
