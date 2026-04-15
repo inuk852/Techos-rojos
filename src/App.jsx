@@ -38,7 +38,7 @@ export default function RestauranteDemo() {
   // CAJA
   const [cajaTotal, setCajaTotal] = useState(0);
 
-  // MESAS (cada mesa con su cuenta)
+  // MESAS
   const [mesas, setMesas] = useState([
     { id: 1, pedidos: [] },
     { id: 2, pedidos: [] }
@@ -97,28 +97,58 @@ export default function RestauranteDemo() {
 
   // DOMICILIOS
   const [domicilios, setDomicilios] = useState([]);
-  const [domActual, setDomActual] = useState({ cliente: "", direccion: "", pedidos: [] });
+  const [domActual, setDomActual] = useState({
+  cliente: "",
+  direccion: "",
+  pedidos: [],
+  creando: false
+});
 
   const agregarProductoDomicilio = (producto) => {
     setDomActual({ ...domActual, pedidos: [...domActual.pedidos, producto] });
   };
 
   const crearDomicilio = () => {
-    if (!domActual.cliente || domActual.pedidos.length === 0) return;
-    setDomicilios([...domicilios, { ...domActual, id: Date.now() }]);
-    setDomActual({ cliente: "", direccion: "", pedidos: [] });
-  };
+  if (!domActual.cliente || domActual.pedidos.length === 0) return;
+
+  setDomicilios([
+    ...domicilios,
+    { ...domActual, id: Date.now() }
+  ]);
+
+  setDomActual({ cliente: "", direccion: "", pedidos: [], creando: false });
+};
 
   const cerrarDomicilio = (id, entregado) => {
     const dom = domicilios.find(d => d.id === id);
     const total = dom.pedidos.reduce((acc, p) => acc + Number(p.precio), 0);
 
-    if (entregado) {
-      setCajaTotal(cajaTotal + total);
-    }
+    if (entregado) setCajaTotal(cajaTotal + total);
 
     setDomicilios(domicilios.filter(d => d.id !== id));
   };
+
+  // SIDEBAR (IZQUIERDA)
+  const renderSidebar = () => (
+    <div style={{
+      position: "fixed",
+      left: 0,
+      top: 0,
+      height: "100%",
+      width: "180px",
+      background: "rgba(139,0,0,0.9)",
+      borderRight: "2px solid gold",
+      padding: "10px",
+      zIndex: 2
+    }}>
+      <Button onClick={() => setScreen("home")}>🏠 Inicio</Button>
+      <Button onClick={() => setScreen("mesa")}>Mesa</Button>
+      <Button onClick={() => setScreen("rapido")}>Rápido</Button>
+      <Button onClick={() => setScreen("domicilio")}>Domicilio</Button>
+      <Button onClick={() => setScreen("caja")}>Caja</Button>
+      <Button onClick={() => setScreen("config")}>Config</Button>
+    </div>
+  );
 
   const renderScreen = () => {
     switch (screen) {
@@ -186,40 +216,83 @@ export default function RestauranteDemo() {
         );
 
       case "domicilio":
+  return (
+    <Card>
+      <h2 style={{ color: "gold" }}>Domicilios</h2>
+
+      {/* BOTÓN PARA CREAR */}
+      {!domActual.creando && (
+        <Button onClick={() => setDomActual({ ...domActual, creando: true })}>
+          ➕ Crear nuevo domicilio
+        </Button>
+      )}
+
+      {/* CREACIÓN DE DOMICILIO */}
+      {domActual.creando && (
+        <>
+          <h3>Nuevo pedido</h3>
+
+          <input
+            placeholder="Cliente"
+            value={domActual.cliente}
+            onChange={(e) => setDomActual({ ...domActual, cliente: e.target.value })}
+          />
+          <input
+            placeholder="Dirección"
+            value={domActual.direccion}
+            onChange={(e) => setDomActual({ ...domActual, direccion: e.target.value })}
+          />
+
+          <h3>Seleccionar productos</h3>
+          {productos.map((p, i) => (
+            <Button key={i} onClick={() => agregarProductoDomicilio(p)}>
+              {p.nombre}
+            </Button>
+          ))}
+
+          {/* PREVISUALIZACIÓN */}
+          <h3>Pedido actual</h3>
+          {domActual.pedidos.map((p, i) => (
+            <div key={i}>{p.nombre} - ${p.precio}</div>
+          ))}
+
+          <Button onClick={crearDomicilio}>✅ Aceptar pedido</Button>
+          <Button onClick={() => setDomActual({ cliente: "", direccion: "", pedidos: [] })}>
+            ❌ Cancelar
+          </Button>
+        </>
+      )}
+
+      {/* DOMICILIOS ACTIVOS */}
+      <h3>Activos</h3>
+      {domicilios.map(d => {
+        const total = d.pedidos.reduce((acc, p) => acc + Number(p.precio), 0);
+
         return (
-          <Card>
-            <h2 style={{ color: "gold" }}>Domicilios</h2>
+          <div key={d.id} style={{
+            border: "1px solid gold",
+            padding: "10px",
+            marginTop: "10px",
+            borderRadius: "10px"
+          }}>
+            <p><strong>{d.cliente}</strong></p>
+            <p>{d.direccion}</p>
 
-            <input
-              placeholder="Cliente"
-              value={domActual.cliente}
-              onChange={(e) => setDomActual({ ...domActual, cliente: e.target.value })}
-            />
-            <input
-              placeholder="Dirección"
-              value={domActual.direccion}
-              onChange={(e) => setDomActual({ ...domActual, direccion: e.target.value })}
-            />
-
-            <h3>Agregar productos</h3>
-            {productos.map((p, i) => (
-              <Button key={i} onClick={() => agregarProductoDomicilio(p)}>
-                {p.nombre}
-              </Button>
+            <h4>Pedido:</h4>
+            {d.pedidos.map((p, i) => (
+              <div key={i}>{p.nombre} - ${p.precio}</div>
             ))}
 
-            <Button onClick={crearDomicilio}>Crear domicilio</Button>
+            <p><strong>Total: ${total}</strong></p>
 
-            <h3>Activos</h3>
-            {domicilios.map(d => (
-              <div key={d.id}>
-                <p>{d.cliente} - {d.direccion}</p>
-                <Button onClick={() => cerrarDomicilio(d.id, true)}>Entregado</Button>
-                <Button onClick={() => cerrarDomicilio(d.id, false)}>Cancelado</Button>
-              </div>
-            ))}
-          </Card>
+            <Button onClick={() => window.print()}>🖨️ Imprimir</Button>
+            <Button onClick={() => cerrarDomicilio(d.id, true)}>✔ Entregado</Button>
+            <Button onClick={() => cerrarDomicilio(d.id, false)}>❌ Cancelado</Button>
+          </div>
         );
+      })}
+    </Card>
+  );
 
       case "caja":
         return (
@@ -255,7 +328,7 @@ export default function RestauranteDemo() {
 
       default:
         return (
-          <div style={{ display: "flex", flexWrap: "wrap" }}>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
             <Button onClick={() => setScreen("mesa")}>Mesa</Button>
             <Button onClick={() => setScreen("rapido")}>Rápido</Button>
             <Button onClick={() => setScreen("domicilio")}>Domicilio</Button>
@@ -279,7 +352,9 @@ export default function RestauranteDemo() {
     >
       <div style={{ position: "fixed", inset: 0, background: "rgba(30,0,0,0.6)", zIndex: 0 }} />
 
-      <div style={{ position: "relative", zIndex: 1 }}>
+      {screen !== "home" && renderSidebar()}
+
+      <div style={{ position: "relative", zIndex: 1, marginLeft: screen !== "home" ? "190px" : "0" }}>
         <h1 style={{ color: "gold" }}>Demo Sistema Restaurante</h1>
 
         {screen !== "home" && (
